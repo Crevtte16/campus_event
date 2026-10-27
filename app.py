@@ -6,7 +6,7 @@ Gestion d'événements universitaires
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from datetime import datetime
-
+#ilyes
 app = Flask(__name__)
 CORS(app)  # Permet au frontend (index.html) d'accéder à l'API sans blocage CORS
 
