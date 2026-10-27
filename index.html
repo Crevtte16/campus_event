@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAMPUS EVENT — Gestion d'événements universitaires</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 32px 16px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 12px;
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0284c7;
+        }
+
+        /* Layout en 2 colonnes */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        @media (min-width: 860px) {
+            .main-grid {
+                grid-template-columns: 1.6fr 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Cartes d'événements */
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .event-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .event-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .event-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-available {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-full {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .event-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+        }
+
+        .event-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 0.88rem;
+            color: #475569;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .event-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Formulaire & Panneau de droite */
+        .sidebar-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        button.btn-primary {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        button.btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Alertes */
+        .alert {
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .refresh-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .empty-state {
+            padding: 32px;
+            text-align: center;
+            background: var(--surface);
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            border: 1px dashed var(--border);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🎓 CAMPUS EVENT</h1>
+        <p>Portail Universitaire de Consultation et d'Inscription aux Événements</p>
+        <div class="status-badge" id="apiStatusBadge">
+            <span class="status-dot"></span>
+            <span id="apiStatusText">Connexion à l'API en cours...</span>
+        </div>
+    </header>
+
+    <div class="main-grid">
+        <!-- Colonne Gauche : Événements -->
+        <section>
+            <div class="section-title">
+                <span>Événements disponibles</span>
+                <button class="refresh-btn" onclick="fetchEvents()">🔄 Rafraîchir</button>
+            </div>
+
+            <div id="eventsContainer" class="events-list">
+                <div class="empty-state">Chargement des événements depuis l'API...</div>
+            </div>
+
+            <!-- Message d'erreur API global -->
+            <div id="globalErrorAlert" class="alert alert-danger"></div>
+        </section>
+
+        <!-- Colonne Droite : Formulaire d'inscription (Fonctionnalité Bonus) -->
+        <aside>
+            <div class="sidebar-card">
+                <div class="section-title" style="margin-bottom: 20px;">
+                    <span>S'inscrire à un événement</span>
+                </div>
+
+                <form id="registrationForm" onsubmit="handleRegistration(event)">
+                    <div class="form-group">
+                        <label for="studentSelect">Étudiant :</label>
+                        <select id="studentSelect" required>
+                            <option value="">-- Sélectionnez un étudiant --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventSelect">Événement :</label>
+                        <select id="eventSelect" required>
+                            <option value="">-- Sélectionnez un événement --</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-primary">
+                        Confirmer mon inscription
+                    </button>
+                </form>
+
+                <!-- Retours de l'API -->
+                <div id="formSuccessAlert" class="alert alert-success"></div>
+                <div id="formErrorAlert" class="alert alert-danger"></div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+    const API_BASE_URL = "http://127.0.0.1:5000";
+
+    // 1. Initialisation au chargement de la page
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchEvents();
+        fetchStudents();
+    });
+
+    // 2. Récupération des événements (GET /events) avec fetch()
+    async function fetchEvents() {
+        const container = document.getElementById("eventsContainer");
+        const globalAlert = document.getElementById("globalErrorAlert");
+        const statusText = document.getElementById("apiStatusText");
+        const statusBadge = document.getElementById("apiStatusBadge");
+
+        globalAlert.style.display = "none";
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/events`);
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP : statut ${response.status}`);
+            }
+
+            const events = await response.json();
+
+            // Mise à jour de l'indicateur d'état
+            statusText.innerText = "API REST connectée (http://127.0.0.1:5000)";
+            statusBadge.style.background = "#dcfce7";
+            statusBadge.style.color = "#166534";
+
+            // Rendu dynamique des événements
+            renderEvents(events);
+            updateEventDropdown(events);
+
+        } catch (error) {
+            console.error("Erreur lors de la récupération des événements :", error);
+            statusText.innerText = "API déconnectée / non joignable";
+            statusBadge.style.background = "#fee2e2";
+            statusBadge.style.color = "#991b1b";
+
+            container.innerHTML = `
+                <div class="empty-state" style="color: #b91c1c;">
+                    ⚠️ <strong>Impossible de contacter l'API Flask</strong><br>
+                    Assurez-vous que le serveur est bien lancé avec : <code>python app.py</code>
+                </div>
+            `;
+
+            globalAlert.innerText = `Erreur de communication avec l'API : ${error.message}. Vérifiez que app.py tourne bien sur http://127.0.0.1:5000.`;
+            globalAlert.style.display = "block";
+        }
+    }
+
+    // 3. Affichage dynamique des cartes événements
+    function renderEvents(events) {
+        const container = document.getElementById("eventsContainer");
+
+        if (!events || events.length === 0) {
+            container.innerHTML = `<div class="empty-state">Aucun événement disponible pour le moment.</div>`;
+            return;
+        }
+
+        container.innerHTML = events.map(event => {
+            const isFull = event.available_seats <= 0;
+            const badgeClass = isFull ? "badge-full" : "badge-available";
+            const badgeText = isFull ? "Complet" : `${event.available_seats} place(s) restante(s)`;
+
+            return `
+                <article class="event-card" id="event-${event.id}">
+                    <div class="event-header">
+                        <h2 class="event-title">${escapeHtml(event.title)}</h2>
+                        <span class="event-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <p class="event-description">${escapeHtml(event.description || "Aucune description fournie.")}</p>
+                    <div class="event-details">
+                        <div class="event-detail-item">
+                            <span>📍 <strong>Lieu :</strong> ${escapeHtml(event.location || "Non précisé")}</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <span>📅 <strong>Date :</strong> ${escapeHtml(event.date || "À définir")}</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <span>👥 <strong>Capacité :</strong> ${event.capacity} places</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <span>🎟️ <strong>Places disponibles :</strong> ${event.available_seats}</span>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join("");
+    }
+
+    // 4. Récupération des étudiants pour le formulaire (GET /students)
+    async function fetchStudents() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/students`);
+            if (!response.ok) return;
+            const students = await response.json();
+
+            const studentSelect = document.getElementById("studentSelect");
+            studentSelect.innerHTML = `<option value="">-- Sélectionnez un étudiant --</option>` +
+                students.map(s => `
+                    <option value="${s.id}">${escapeHtml(s.first_name)} ${escapeHtml(s.last_name)} (${escapeHtml(s.major)})</option>
+                `).join("");
+        } catch (e) {
+            console.warn("Impossible de précharger les étudiants :", e);
+        }
+    }
+
+    // 5. Mettre à jour la liste déroulante des événements dans le formulaire
+    function updateEventDropdown(events) {
+        const eventSelect = document.getElementById("eventSelect");
+        eventSelect.innerHTML = `<option value="">-- Sélectionnez un événement --</option>` +
+            events.map(e => `
+                <option value="${e.id}" ${e.available_seats <= 0 ? "disabled" : ""}>
+                    ${escapeHtml(e.title)} (${e.available_seats} place${e.available_seats > 1 ? "s" : ""})
+                </option>
+            `).join("");
+    }
+
+    // 6. Envoi de l'inscription (POST /registrations) avec fetch()
+    async function handleRegistration(e) {
+        e.preventDefault();
+
+        const studentId = parseInt(document.getElementById("studentSelect").value);
+        const eventId = parseInt(document.getElementById("eventSelect").value);
+        const submitBtn = document.getElementById("submitBtn");
+        const successAlert = document.getElementById("formSuccessAlert");
+        const errorAlert = document.getElementById("formErrorAlert");
+
+        successAlert.style.display = "none";
+        errorAlert.style.display = "none";
+
+        if (!studentId || !eventId) {
+            errorAlert.innerText = "Veuillez sélectionner un étudiant et un événement.";
+            errorAlert.style.display = "block";
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Inscription en cours...";
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/registrations`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    event_id: eventId
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.status === 201) {
+                successAlert.innerHTML = `
+                    ✅ <strong>Succès (201 Created) !</strong><br>
+                    ${escapeHtml(data.message)}.<br>
+                    Numéro d'inscription : <strong>#${data.registration.id}</strong><br>
+                    Statut initial : <em>${data.registration.status}</em>
+                `;
+                successAlert.style.display = "block";
+                document.getElementById("registrationForm").reset();
+
+                // Rafraîchir les événements pour mettre à jour les jauges de places en temps réel
+                fetchEvents();
+            } else {
+                // Gestion des erreurs métier (400, 404, 409)
+                const errorMsg = data.error || data.message || "Erreur lors de l'inscription";
+                errorAlert.innerHTML = `
+                    ❌ <strong>Erreur (${response.status}) :</strong><br>
+                    ${escapeHtml(errorMsg)}
+                `;
+                errorAlert.style.display = "block";
+            }
+        } catch (err) {
+            errorAlert.innerHTML = `❌ Erreur réseau lors de l'appel à l'API : ${escapeHtml(err.message)}`;
+            errorAlert.style.display = "block";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Confirmer mon inscription";
+        }
+    }
+
+    // Échappement HTML sécurisé
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
+
+</body>
+</html>

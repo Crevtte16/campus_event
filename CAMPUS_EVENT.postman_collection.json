@@ -1,0 +1,435 @@
+{
+	"info": {
+		"_postman_id": "c4d8e792-7f31-482a-9e5c-campusevent2026",
+		"name": "CAMPUS EVENT — API Tests",
+		"description": "Collection Postman complète pour le projet CAMPUS EVENT. Contient l'ensemble des 10 tests obligatoires décrits à la Partie 5 du sujet, avec assertions automatiques de code HTTP (200, 201, 400, 404, 409).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:5000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. GET /events (Consulter tous les événements)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Réponse contient une liste d'événements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/events",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"events"
+					]
+				},
+				"description": "Consulter l'ensemble des événements disponibles avec calcul des places restantes."
+			},
+			"response": []
+		},
+		{
+			"name": "2. GET /events/1 (Événement existant)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"L'événement possède un id et un titre\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.eql(1);",
+							"    pm.expect(jsonData).to.have.property('title');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/events/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"events",
+						"1"
+					]
+				},
+				"description": "Consulter les détails d'un événement existant (ID 1)."
+			},
+			"response": []
+		},
+		{
+			"name": "3. GET /events/999 (Événement inexistant)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 404 Not Found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"pm.test(\"Message d'erreur retourné\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/events/999",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"events",
+						"999"
+					]
+				},
+				"description": "Consulter un identifiant d'événement inexistant (doit retourner 404)."
+			},
+			"response": []
+		},
+		{
+			"name": "4. POST /registrations (Inscription valide)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"pm.test(\"Statut initial 'pending' et ID généré\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.registration.status).to.eql('pending');",
+							"    pm.expect(jsonData.registration).to.have.property('id');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"student_id\": 1,\n    \"event_id\": 2\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/registrations",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"registrations"
+					]
+				},
+				"description": "Créer une inscription valide pour un étudiant et un événement existants."
+			},
+			"response": []
+		},
+		{
+			"name": "5. POST /registrations (JSON incomplet)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"pm.test(\"Message de champs obligatoires absents\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"student_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/registrations",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"registrations"
+					]
+				},
+				"description": "Tentative de création avec un corps JSON incomplet (event_id manquant)."
+			},
+			"response": []
+		},
+		{
+			"name": "6. POST /registrations (Étudiant inexistant)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 404 Not Found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"pm.test(\"Message indiquant que l'étudiant est introuvable\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.include('Étudiant');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"student_id\": 999,\n    \"event_id\": 2\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/registrations",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"registrations"
+					]
+				},
+				"description": "Inscription avec un identifiant étudiant inexistant (ID 999)."
+			},
+			"response": []
+		},
+		{
+			"name": "7. POST /registrations (Événement inexistant)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 404 Not Found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"pm.test(\"Message indiquant que l'événement est introuvable\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.include('Événement');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"student_id\": 1,\n    \"event_id\": 999\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/registrations",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"registrations"
+					]
+				},
+				"description": "Inscription avec un identifiant d'événement inexistant (ID 999)."
+			},
+			"response": []
+		},
+		{
+			"name": "8. POST /registrations (Événement complet)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 409 Conflict\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							"pm.test(\"Erreur d'événement complet\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql('Événement complet');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"student_id\": 4,\n    \"event_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/registrations",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"registrations"
+					]
+				},
+				"description": "Tentative d'inscription sur un événement dont la jauge maximale est atteinte (doit renvoyer 409 Conflict)."
+			},
+			"response": []
+		},
+		{
+			"name": "9. POST /registrations (Double inscription)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 409 Conflict\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							"pm.test(\"Détection de la double inscription\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.include('Double inscription');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"student_id\": 1,\n    \"event_id\": 2\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/registrations",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"registrations"
+					]
+				},
+				"description": "Réinscription d'un étudiant déjà enregistré au même événement (doit renvoyer 409 Conflict)."
+			},
+			"response": []
+		},
+		{
+			"name": "10. PATCH /registrations/1 (Modifier le statut)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code attendu : 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Statut mis à jour vers 'accepted'\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.registration.status).to.eql('accepted');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"accepted\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/registrations/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"registrations",
+						"1"
+					]
+				},
+				"description": "Mise à jour du statut d'une inscription existante vers 'accepted' par l'organisateur."
+			},
+			"response": []
+		}
+	]
+}
